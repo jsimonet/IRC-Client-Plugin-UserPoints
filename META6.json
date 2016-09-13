@@ -7,7 +7,7 @@
 	"provides" : {
 		"IRC::Client::Plugin::UserPoints" : "lib/IRC/Client/Plugin/UserPoints.pm6"
 	},
-	"depends" : [ "PerlStore::FileStore" ],
+	"depends" : [ "PerlStore::FileStore", "IRC::Client" ],
 	"resources" : [ ],
 	"source-url" : "git@github.com:jsimonet/IRC-Client-Plugin-UserPoints.git"
 }
