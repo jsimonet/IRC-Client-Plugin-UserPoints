@@ -12,7 +12,7 @@ class IRC::Client::Plugin::UserPoints {
 	# Load the hash from $db-file-name if it is readable and writable
 	# TODO Check &from-file returns
 	has %!user-points
-		= $!db-file-name.IO.rw
+		=  ( $!db-file-name.IO.r && $!db-file-name.IO.w )
 			?? from_file( $!db-file-name )
 			!! Hash.new;
 
