@@ -22,7 +22,6 @@ class IRC::Client::Plugin::UserPoints {
 		= '!';
 
 	# TODO Overflow check : -1 point if overflow
-	# TODO user check : cannot add a point to itself
 	# TODO Reduce message because spamming
 	# TODO Congratulates a user when he reaches 42 points in a category
 	# TODO Save the current channel when adding a point
@@ -32,6 +31,10 @@ class IRC::Client::Plugin::UserPoints {
 		my $category = $2
 			?? $2
 			!! 'main';
+
+		# Check if $user-name is different from message sender
+		return "Influencing points of himself is not possible."
+			if $e.nick() ~~ $user-name;
 
 		my $operation-name = '';
 
