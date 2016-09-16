@@ -27,9 +27,9 @@ class IRC::Client::Plugin::UserPoints {
 	# TODO Reduce message because spamming
 	# TODO Save the current channel when adding a point
 	multi method irc-all( $e where /^ (\w+) ([\+\+ | \-\-]) [\s+ (\w+) ]? $/ ) {
-		my $user-name = $0;
-		my $operation = $1;
-		my $category = $2
+		my Str $user-name = $0.Str;
+		my Str $operation = $1.Str;
+		my $category =  $2.Str
 			?? $2
 			!! 'main';
 
@@ -68,12 +68,19 @@ class IRC::Client::Plugin::UserPoints {
 
 	# TODO Total for !scores
 	# TODO Detailed for !scores <nick>
-	multi method irc-all( $e where { my $p = $!command-prefix; $e ~~ /^ $p "scores" / } ) {
+	multi method irc-all( $e where { my $p = $!command-prefix; $e ~~ /^ $p "scores" [ \h+ $<nicks> = \w+]* $/ } ) {
+
 		unless keys %!user-points {
 			return "No attributed points, yet!"
 		}
 
-		for keys %!user-points -> $user-name {
+		my @nicks = keys %!user-points;
+		if $<nicks> {
+			# Calculate the intersection between given nicks and existing nicks
+			@nicks = ($<nicks> (&) keys %!user-points).keys;
+		}
+
+		for @nicks -> $user-name {
 			my @rep;
 			for %!user-points{$user-name} -> %cat {
 				for kv %cat -> $k, $v {
@@ -82,5 +89,15 @@ class IRC::Client::Plugin::UserPoints {
 			}
 			$e.reply: "« $user-name » has some points : { join( ', ', @rep ) }";
 		}
+
+#		my $total;
+#		for keys %!user-points -> $user-name {
+#			for %!user-points{$user-name} -> %cat {
+#				for kv %cat -> $k, $v {
+#					$total += $v;
+#				}
+#			}
+#		}
+
 	}
 }
