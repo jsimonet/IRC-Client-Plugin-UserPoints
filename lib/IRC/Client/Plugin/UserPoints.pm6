@@ -21,9 +21,10 @@ class IRC::Client::Plugin::UserPoints {
 		where .chars > 0 && .chars <=1
 		= '!';
 
+	has Int $.target-points where * > 0 = 42;
+
 	# TODO Overflow check : -1 point if overflow
 	# TODO Reduce message because spamming
-	# TODO Congratulates a user when he reaches 42 points in a category
 	# TODO Save the current channel when adding a point
 	multi method irc-all( $e where /^ (\w+) ([\+\+ | \-\-]) [\s+ (\w+) ]? $/ ) {
 		my $user-name = $0;
@@ -60,7 +61,9 @@ class IRC::Client::Plugin::UserPoints {
 		# Save scores
 		to_file( $!db-file-name, %!user-points );
 
-		"$operation-name one point to $user-name in « $category » category"
+		return %!user-points{$user-name}{$category} == $!target-points
+			?? "Congratulations, $user-name reached $!target-points in $category!"
+			!! "$operation-name one point to $user-name in « $category » category";
 	}
 
 	# TODO Total for !scores
