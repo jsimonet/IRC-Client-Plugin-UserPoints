@@ -74,14 +74,16 @@ class IRC::Client::Plugin::UserPoints {
 			return "No attributed points, yet!"
 		}
 
-		my @nicks = keys %!user-points;
-		if $<nicks> {
-			# Calculate the intersection between given nicks and existing nicks
-			@nicks = ($<nicks>».Str (&) keys %!user-points).keys;
-		}
+		my @nicks = $<nicks>
+			?? $<nicks>».Str
+			!! keys %!user-points;
 
 		for @nicks -> $user-name {
 			my @rep;
+			unless %!user-points{$user-name}:exists {
+				$e.reply: "« $user-name » does not have any points yet.";
+				next;
+			}
 			for %!user-points{$user-name} -> %cat {
 				for kv %cat -> $k, $v {
 					push @rep, "$v for $k";
