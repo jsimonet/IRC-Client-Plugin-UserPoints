@@ -77,7 +77,7 @@ class IRC::Client::Plugin::UserPoints {
 		my @nicks = keys %!user-points;
 		if $<nicks> {
 			# Calculate the intersection between given nicks and existing nicks
-			@nicks = ($<nicks> (&) keys %!user-points).keys;
+			@nicks = ($<nicks>».Str (&) keys %!user-points).keys;
 		}
 
 		for @nicks -> $user-name {
