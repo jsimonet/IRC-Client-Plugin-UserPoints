@@ -89,15 +89,26 @@ class IRC::Client::Plugin::UserPoints {
 			}
 			$e.reply: "« $user-name » has some points : { join( ', ', @rep ) }";
 		}
-
-#		my $total;
-#		for keys %!user-points -> $user-name {
-#			for %!user-points{$user-name} -> %cat {
-#				for kv %cat -> $k, $v {
-#					$total += $v;
-#				}
-#			}
-#		}
-
 	}
+
+	multi method irc-all( $e where { my $p = $!command-prefix; $e ~~ /^ $p "sum" [ \h+ $<nicks> = \w+]* $/ } ) {
+		my $sum;
+
+		my @nicks = $<nicks>
+			?? $<nicks>».Str
+			!! keys %!user-points;
+
+		for @nicks -> $user-name {
+			next unless %!user-points{$user-name}:exists;
+
+			for %!user-points{$user-name} -> %cat {
+				for kv %cat -> $k, $v {
+					$sum += $v;
+				}
+			}
+		}
+
+		return "Total points : $sum";
+	}
+
 }
