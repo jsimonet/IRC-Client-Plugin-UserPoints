@@ -10,7 +10,6 @@ class IRC::Client::Plugin::UserPoints {
 		= 'userPoints.txt';
 
 	# Load the hash from $db-file-name if it is readable and writable
-	# TODO Check &from-file returns
 	has %!user-points
 		=  ( $!db-file-name.IO.r && $!db-file-name.IO.w )
 			?? from_file( $!db-file-name )
@@ -67,7 +66,6 @@ class IRC::Client::Plugin::UserPoints {
 	}
 
 	# TODO Total for !scores
-	# TODO Detailed for !scores <nick>
 	multi method irc-all( $e where { my $p = $!command-prefix; $e ~~ /^ $p "scores" [ \h+ $<nicks> = \w+]* $/ } ) {
 
 		unless keys %!user-points {
@@ -86,7 +84,7 @@ class IRC::Client::Plugin::UserPoints {
 			}
 			for %!user-points{$user-name} -> %cat {
 				for kv %cat -> $k, $v {
-					push @rep, "$v for $k";
+					push @rep, "$v in $k";
 				}
 			}
 			$e.reply: "« $user-name » has some points : { join( ', ', @rep ) }";
