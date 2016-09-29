@@ -10,7 +10,6 @@ class IRC::Client::Plugin::UserPoints {
 		= 'userPoints.txt';
 
 	# Load the hash from $db-file-name if it is readable and writable
-	# TODO Check &from-file returns
 	has %!user-points
 		=  ( $!db-file-name.IO.r && $!db-file-name.IO.w )
 			?? from_file( $!db-file-name )
@@ -26,7 +25,7 @@ class IRC::Client::Plugin::UserPoints {
 	# TODO Overflow check : -1 point if overflow
 	# TODO Reduce message because spamming
 	# TODO Save the current channel when adding a point
-	multi method irc-all( $e where /^ (\w+) ([\+\+ | \-\-]) [\s+ (\w+) ]? $/ ) {
+	multi method irc-all( $e where /^ (\w+) ([\+\+ | \-\-]) [\s+ (<[ \w \s ]>+) ]? $/ ) {
 		my Str $user-name = $0.Str;
 		my Str $operation = $1.Str;
 		my $category =  $2.Str
@@ -67,7 +66,6 @@ class IRC::Client::Plugin::UserPoints {
 	}
 
 	# TODO Total for !scores
-	# TODO Detailed for !scores <nick>
 	multi method irc-all( $e where { my $p = $!command-prefix; $e ~~ /^ $p "scores" [ \h+ $<nicks> = \w+]* $/ } ) {
 
 		unless keys %!user-points {
@@ -86,20 +84,31 @@ class IRC::Client::Plugin::UserPoints {
 			}
 			for %!user-points{$user-name} -> %cat {
 				for kv %cat -> $k, $v {
-					push @rep, "$v for $k";
+					push @rep, "$v in $k";
 				}
 			}
 			$e.reply: "« $user-name » has some points : { join( ', ', @rep ) }";
 		}
-
-#		my $total;
-#		for keys %!user-points -> $user-name {
-#			for %!user-points{$user-name} -> %cat {
-#				for kv %cat -> $k, $v {
-#					$total += $v;
-#				}
-#			}
-#		}
-
 	}
+
+	multi method irc-all( $e where { my $p = $!command-prefix; $e ~~ /^ $p "sum" [ \h+ $<nicks> = \w+]* $/ } ) {
+		my $sum;
+
+		my @nicks = $<nicks>
+			?? $<nicks>».Str
+			!! keys %!user-points;
+
+		for @nicks -> $user-name {
+			next unless %!user-points{$user-name}:exists;
+
+			for %!user-points{$user-name} -> %cat {
+				for kv %cat -> $k, $v {
+					$sum += $v;
+				}
+			}
+		}
+
+		return "Total points : $sum";
+	}
+
 }
