@@ -25,7 +25,7 @@ class IRC::Client::Plugin::UserPoints {
 	# TODO Overflow check : -1 point if overflow
 	# TODO Reduce message because spamming
 	# TODO Save the current channel when adding a point
-	multi method irc-all( $e where /^ (\w+) ([\+\+ | \-\-]) [\s+ (\w+) ]? $/ ) {
+	multi method irc-all( $e where /^ (\w+) ([\+\+ | \-\-]) [\s+ (<[ \w \s ]>+) ]? $/ ) {
 		my Str $user-name = $0.Str;
 		my Str $operation = $1.Str;
 		my $category =  $2.Str
