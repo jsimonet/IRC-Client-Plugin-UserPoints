@@ -9,6 +9,8 @@ class IRC::Client::Plugin::UserPoints {
 		is readonly
 		= 'userPoints.txt';
 
+	has $.list-scores-max-user where * > 0 = +Inf;
+
 	# Load the hash from $db-file-name if it is readable and writable
 	has %!user-points
 		=  ( $!db-file-name.IO.r && $!db-file-name.IO.w )
@@ -78,6 +80,10 @@ class IRC::Client::Plugin::UserPoints {
 		my @nicks = $<nicks>
 			?? $<nicks>».Str
 			!! keys %!user-points;
+
+		if @nicks.elems > $!list-scores-max-user {
+			return "Too much results, please be more specific in your request.";
+		}
 
 		for @nicks -> $user-name {
 			my @rep;
