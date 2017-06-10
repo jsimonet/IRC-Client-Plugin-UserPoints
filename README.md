@@ -48,7 +48,8 @@ can be used.
     IRC::Client::Plugin::UserPoints.new(
         :db-file-name( 'path/to/file.txt' ),
         :command-prefix( '!' ),
-        :list-scores-max-user(5)
+        :list-scores-max-user(5),
+        :msg-confirm( False )
     )
 ```
 
@@ -65,6 +66,10 @@ The command prefix is used to determine the char used to trigger the bot.
 The maximum number of users the bot can print their points. Can be used to prevent spam.
 
 Default value: +Inf (Infinite)
+
+## msg-confirm
+
+Confirm on IRC when a point have been handled.
 
 # IRC COMMANDS
 
