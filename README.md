@@ -49,7 +49,7 @@ can be used.
         :db-file-name( 'path/to/file.txt' ),
         :command-prefix( '!' ),
         :list-scores-max-user(5),
-        :msg-confirm( False )
+        :msg-confirm( '#channel1' => True )
     )
 ```
 
@@ -70,6 +70,8 @@ Default value: +Inf (Infinite)
 ## msg-confirm
 
 Confirm on IRC when a point have been handled.
+
+Defaults to False.
 
 # IRC COMMANDS
 
