@@ -115,7 +115,7 @@ class IRC::Client::Plugin::UserPoints {
 	}
 
 	multi method irc-all( $e where { my $p = $!command-prefix; $e ~~ /^ $p "sum" [ \h+ $<nicks> = \w+]* \s* $/ } ) {
-		my $sum;
+		my $sum = 0;
 
 		my @nicks = $<nicks>
 			?? $<nicks>».Str
@@ -131,7 +131,9 @@ class IRC::Client::Plugin::UserPoints {
 			}
 		}
 
-		return "Total points : $sum";
+		return $sum
+			?? "Total points : $sum"
+			!! "No attributed points yet!";
 	}
 
 }
