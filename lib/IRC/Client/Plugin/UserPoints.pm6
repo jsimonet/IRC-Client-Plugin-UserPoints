@@ -30,8 +30,8 @@ class IRC::Client::Plugin::UserPoints {
 	multi method irc-all( $e where /^ (\w+) ([\+\+ | \-\-]) [\s+ (<[ \w \s ]>+) ]? \s* $/ ) {
 		my Str $user-name = $0.Str;
 		my Str $operation = $1.Str;
-		my $category =  $2.Str
-			?? $2
+		my $category = $2
+			?? $2.Str
 			!! 'main';
 
 		# Check if $user-name is different from message sender
