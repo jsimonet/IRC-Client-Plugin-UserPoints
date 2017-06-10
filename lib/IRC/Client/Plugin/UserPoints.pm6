@@ -29,7 +29,7 @@ class IRC::Client::Plugin::UserPoints {
 	# TODO Overflow check : -1 point if overflow
 	# TODO Reduce message because spamming
 	# TODO Save the current channel when adding a point
-	multi method irc-all( $e where /^ (\w+) ([\+\+ | \-\-]) [\s+ (<[ \w \s ]>+) ]? \s* $/ ) {
+	multi method irc-all( $e where /^ (\w+) ([\+\+ | \-\-]) [\s+ (<-[ \n ]>+) ]? \s* $/ ) {
 		my Str $user-name = $0.Str;
 		my Str $operation = $1.Str;
 		my $category = $2
@@ -97,12 +97,20 @@ class IRC::Client::Plugin::UserPoints {
 				$e.reply: "« $user-name » does not have any points yet.";
 				next;
 			}
+			my $response = "« $user-name » points: ";
 			for %!user-points{$user-name} -> %cat {
 				for kv %cat -> $k, $v {
-					push @rep, "$v in $k";
+					# Check if the size is less than 512
+					# "user: categ: 42, categ2: 42"
+					if $e.channel.codes + $e.nick.codes + 2 + $response.codes + "$k: $v, ".codes + 20 > 512 {
+						$e.reply: $response;
+						$response = '... ';
+					}
+					$response ~= "$k: $v, ";
 				}
+				$response ~~ s/ ', ' $//;
+				$e.reply: $response;
 			}
-			$e.reply: "« $user-name » has some points : { join( ', ', @rep ) }";
 		}
 	}
 
