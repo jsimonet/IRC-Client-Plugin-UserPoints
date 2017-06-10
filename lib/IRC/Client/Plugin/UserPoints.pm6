@@ -24,6 +24,8 @@ class IRC::Client::Plugin::UserPoints {
 
 	has Int $.target-points where * > 0 = 42;
 
+	has Bool $.msg-confirm = False;
+
 	# TODO Overflow check : -1 point if overflow
 	# TODO Reduce message because spamming
 	# TODO Save the current channel when adding a point
@@ -62,9 +64,13 @@ class IRC::Client::Plugin::UserPoints {
 		# Save scores
 		to_file( $!db-file-name, %!user-points );
 
-		return %!user-points{$user-name}{$category} == $!target-points
-			?? "Congratulations, $user-name reached $!target-points in $category!"
-			!! "$operation-name one point to $user-name in « $category » category";
+		if $!msg-confirm {
+			return %!user-points{$user-name}{$category} == $!target-points
+				?? "Congratulations, $user-name reached $!target-points in $category!"
+				!!  "$operation-name one point to $user-name in « $category » category";
+		}
+
+		Nil; # Do not generate message response
 	}
 
 	# TODO Total for !scores
